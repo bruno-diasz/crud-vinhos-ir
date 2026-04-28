@@ -104,6 +104,12 @@ export class App {
     }
   }
 
+  delete(id: number) {
+    this.vinhos = this.vinhos.filter(item => item.id != id);
+    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Vinho excluido com sucesso` });
+  }
+
+
   cleanForm() {
     this.nome = '';
     this.preco = 0;
