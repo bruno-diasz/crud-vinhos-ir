@@ -119,6 +119,31 @@ export class App {
     this.disponivel = vinho.disponivel;
   }
 
+  showDeleteDialog(event: Event, vinho: Vinho) {
+    console.log("Func")
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `Tem certeza que deseja excluir o vinho <b>"${vinho.nome}"</b>?`,
+      header: 'Confirmar Exclusão',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true
+      },
+      acceptButtonProps: {
+        label: 'Excluir',
+        severity: 'danger'
+      },
+
+      accept: () => {
+        this.delete(vinho.id);
+      },
+      reject: () => {
+      }
+    });
+  }
+
 
   cleanForm() {
     this.nome = '';
