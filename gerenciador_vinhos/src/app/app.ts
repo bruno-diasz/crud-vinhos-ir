@@ -68,4 +68,33 @@ export class App {
   messageService = inject(MessageService);
   visible: boolean = false;
 
+  // Metodos
+  save() {
+    if (this.nome != '' && this.preco != null && this.preco > 0) {
+      this.vinhos.push({
+        id: this.nextId,
+        nome: this.nome,
+        preco: this.preco,
+        tipo: this.tipoSelected,
+        disponivel: this.disponivel
+      })
+
+      this.cleanForm()
+      this.nextId++;
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Vinho adicionado com sucesso` });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: `Nome e Valor são obrigatorios` });
+    }
+
+  }
+
+  cleanForm() {
+    this.nome = '';
+    this.preco = 0;
+    this.tipoSelected = '';
+    this.disponivel = false;
+    this.idEmEdicao = null;
+  }
+
+
 }
