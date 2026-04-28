@@ -109,6 +109,16 @@ export class App {
     this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Vinho excluido com sucesso` });
   }
 
+  showUpdateDialog(vinho: Vinho) {
+    this.visible = true;
+
+    this.idEmEdicao = vinho.id;
+    this.nome = vinho.nome;
+    this.preco = vinho.preco;
+    this.tipoSelected = vinho.tipo;
+    this.disponivel = vinho.disponivel;
+  }
+
 
   cleanForm() {
     this.nome = '';
