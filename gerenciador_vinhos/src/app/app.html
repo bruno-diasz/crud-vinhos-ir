@@ -49,7 +49,13 @@
           <td>{{ vinho.nome }}</td>
           <td>{{ vinho.preco | number:'1.2-2' }}</td>
           <td>{{ vinho.tipo }}</td>
-          <td>{{ vinho.disponivel }}</td>
+          <td>
+            @if( vinho.disponivel ){
+              Disponível
+            }@else {
+              Indisponível
+            }
+          </td>
           <td class="space-x-1.5">
             <p-button icon="pi pi-pencil" severity="info" (click)="showUpdateDialog(vinho)"></p-button>
             <p-button icon="pi pi-trash" severity="danger" (click)="showDeleteDialog($event, vinho)"></p-button>
