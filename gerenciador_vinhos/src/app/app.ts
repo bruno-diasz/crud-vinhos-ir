@@ -87,6 +87,22 @@ export class App {
     }
 
   }
+  update() {
+    if (this.idEmEdicao != null && this.nome != '' && this.preco != null && this.preco > 0) {
+      let vinhoEditado: Vinho = {
+        id: this.idEmEdicao,
+        nome: this.nome,
+        preco: this.preco,
+        tipo: this.tipoSelected,
+        disponivel: this.disponivel
+      };
+      this.vinhos = this.vinhos.map(vinho => vinho.id == vinhoEditado.id ? vinhoEditado : vinho);
+      this.cleanForm()
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Vinho editado com sucesso` });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: `Nome e Valor são obrigatorios` });
+    }
+  }
 
   cleanForm() {
     this.nome = '';
