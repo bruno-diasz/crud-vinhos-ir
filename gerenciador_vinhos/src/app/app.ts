@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table'
 import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals'
 import { SelectModule } from 'primeng/select';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -40,7 +41,8 @@ interface Vinho {
     ConfirmDialogModule,
     DialogModule,
     ToastModule,
-    DecimalPipe
+    DecimalPipe,
+    FormField
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -54,13 +56,18 @@ export class App {
   ];
 
   // Campos do formulario
-  nextId: number = 2;
-  nome: string = '';
-  preco: number | null = null;
-  tipos: string[] = ['Suave', 'Seco', 'Branco', 'Tinto'];
-  disponivel: boolean = false;
+  vinho = signal<Vinho>({
+    id: 0,
+    nome: '',
+    preco: 0,
+    disponivel: false,
+    tipo: 'Suave',
+  })
 
-  tipoSelected: string = 'Suave';
+  vinhoForm = form(this.vinho)
+  
+  nextId: number = 2;
+  tipos: string[] = ['Suave', 'Seco', 'Branco', 'Tinto'];
   idEmEdicao: number | null = null;
 
   // Dependencias do dialog
@@ -68,39 +75,61 @@ export class App {
   messageService = inject(MessageService);
   visible: boolean = false;
 
+  // Validações com computed 
+  erroNome = computed(() => {
+    const nome = this.vinhoForm.nome().value();
+    if (!nome || nome.trim() === '') {
+      return 'O nome do vinho é obrigatório.';
+    }
+    return null;
+  });
+
+  erroPreco = computed(() => {
+    const preco = this.vinhoForm.preco().value();
+    if (preco === null || preco <= 0) {
+      return 'O preço deve ser maior que zero.';
+    }
+    return null;
+  });
+
+  formValido = computed(() => {
+    return this.erroNome() === null && this.erroPreco() === null;
+  });
+
+
   // Metodos
   save() {
-    if (this.nome != '' && this.preco != null && this.preco > 0) {
+    if (this.formValido()) {
       this.vinhos.push({
         id: this.nextId,
-        nome: this.nome,
-        preco: this.preco,
-        tipo: this.tipoSelected,
-        disponivel: this.disponivel
+        nome: this.vinhoForm.nome().value(),
+        preco: this.vinhoForm.preco().value(),
+        tipo: this.vinhoForm.tipo().value(),
+        disponivel: this.vinhoForm.disponivel().value()
       })
 
       this.cleanForm()
       this.nextId++;
       this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Vinho adicionado com sucesso` });
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: `Nome e Valor são obrigatorios` });
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: `Verifique os campos obrigatórios` });
     }
-
   }
+
   update() {
-    if (this.idEmEdicao != null && this.nome != '' && this.preco != null && this.preco > 0) {
+    if (this.idEmEdicao != null && this.formValido()) {
       let vinhoEditado: Vinho = {
         id: this.idEmEdicao,
-        nome: this.nome,
-        preco: this.preco,
-        tipo: this.tipoSelected,
-        disponivel: this.disponivel
+        nome: this.vinhoForm.nome().value(),
+        preco: this.vinhoForm.preco().value(),
+        tipo: this.vinhoForm.tipo().value(),
+        disponivel: this.vinhoForm.disponivel().value()
       };
       this.vinhos = this.vinhos.map(vinho => vinho.id == vinhoEditado.id ? vinhoEditado : vinho);
       this.cleanForm()
       this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Vinho editado com sucesso` });
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: `Nome e Valor são obrigatorios` });
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: `Verifique os campos obrigatórios` });
     }
   }
 
@@ -111,16 +140,14 @@ export class App {
 
   showUpdateDialog(vinho: Vinho) {
     this.visible = true;
-
     this.idEmEdicao = vinho.id;
-    this.nome = vinho.nome;
-    this.preco = vinho.preco;
-    this.tipoSelected = vinho.tipo;
-    this.disponivel = vinho.disponivel;
+    this.vinhoForm.nome().value.set(vinho.nome);
+    this.vinhoForm.preco().value.set(vinho.preco);
+    this.vinhoForm.tipo().value.set(vinho.tipo);
+    this.vinhoForm.disponivel().value.set(vinho.disponivel);
   }
 
   showDeleteDialog(event: Event, vinho: Vinho) {
-    console.log("Func")
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: `Tem certeza que deseja excluir o vinho <b>"${vinho.nome}"</b>?`,
@@ -144,14 +171,11 @@ export class App {
     });
   }
 
-
   cleanForm() {
-    this.nome = '';
-    this.preco = 0;
-    this.tipoSelected = '';
-    this.disponivel = false;
+    this.vinhoForm.nome().value.set('');
+    this.vinhoForm.preco().value.set(0);
+    this.vinhoForm.tipo().value.set('Suave');
+    this.vinhoForm.disponivel().value.set(false);
     this.idEmEdicao = null;
   }
-
-
 }
