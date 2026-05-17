@@ -2,31 +2,43 @@
   <h1 class="text-2xl mb-8 text-center font-bold">Gerenciador de Vinhos</h1>
   <p-fieldset legend="Novo Vinho">
     <div class="card grid grid-cols-1 md:grid-cols-2 gap-4">
-      <p-inputgroup>
-        <p-inputgroup-addon>
-          🍷
-        </p-inputgroup-addon>
-        <input pInputText [(ngModel)]="nome" placeholder="Nome" />
-      </p-inputgroup>
-      <p-inputgroup>
-        <p-inputgroup-addon>R$</p-inputgroup-addon>
-        <p-inputnumber [(ngModel)]="preco" placeholder="Preço" mode="decimal" [minFractionDigits]="2"
-          [maxFractionDigits]="2" [showClear]="true" />
-      </p-inputgroup>
+      
+      <div class="flex flex-col">
+        <p-inputgroup>
+          <p-inputgroup-addon>🍷</p-inputgroup-addon>
+          <input pInputText [formField]="vinhoForm.nome" placeholder="Nome" />
+        </p-inputgroup>
+        @if(erroNome()) {
+          <small class="text-red-500 mt-1">{{ erroNome() }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col">
+        <p-inputgroup>
+          <p-inputgroup-addon>R$</p-inputgroup-addon>
+          <p-inputnumber [ngModel]="vinhoForm.preco().value()" (ngModelChange)="vinhoForm.preco().value.set($event)" placeholder="Preço" mode="decimal" [minFractionDigits]="2"
+            [maxFractionDigits]="2" [showClear]="true" />
+        </p-inputgroup>
+        @if(erroPreco()) {
+          <small class="text-red-500 mt-1">{{ erroPreco() }}</small>
+        }
+      </div>
+
       <p-inputgroup>
         <p-inputgroup-addon>
           <i class="pi pi-tags"></i>
         </p-inputgroup-addon>
-        <p-select [(ngModel)]="tipoSelected" [options]="tipos" placeholder="Tipo" />
+        <p-select [ngModel]="vinhoForm.tipo().value()" (ngModelChange)="vinhoForm.tipo().value.set($event)" [options]="tipos" placeholder="Tipo" />
       </p-inputgroup>
+
       <p-inputgroup>
         <p-inputgroup-addon>
           <i class="pi pi-box"></i>
         </p-inputgroup-addon>
-        <p-togglebutton [(ngModel)]="disponivel" onLabel="Disponível" offLabel="Indisponível" />
+        <p-togglebutton [ngModel]="vinhoForm.disponivel().value()" (ngModelChange)="vinhoForm.disponivel().value.set($event)" onLabel="Disponível" offLabel="Indisponível" />
       </p-inputgroup>
 
-      <p-button class="mt-8" label="Salvar" icon="pi pi-check" (onClick)="save()" />
+      <p-button class="mt-8 md:col-span-2" label="Salvar" icon="pi pi-check" (onClick)="save()" [disabled]="!formValido()" />
     </div>
 
   </p-fieldset>
@@ -65,34 +77,47 @@
     </p-table>
     <p-toast />
     <p-confirmdialog />
+    
     <p-dialog header="Editar Vinho" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-      <p-inputgroup class="mb-4">
-        <p-inputgroup-addon>
-          🍷
-        </p-inputgroup-addon>
-        <input pInputText [(ngModel)]="nome" placeholder="Nome" />
-      </p-inputgroup>
-      <p-inputgroup class="mb-4">
-        <p-inputgroup-addon>R$</p-inputgroup-addon>
-        <p-inputnumber [(ngModel)]="preco" placeholder="Preço" mode="decimal" [minFractionDigits]="2"
-          [maxFractionDigits]="2" [showClear]="true" />
-      </p-inputgroup>
+      
+      <div class="mb-4">
+        <p-inputgroup>
+          <p-inputgroup-addon>🍷</p-inputgroup-addon>
+          <input pInputText [formField]="vinhoForm.nome" placeholder="Nome" />
+        </p-inputgroup>
+        @if(erroNome()) {
+          <small class="text-red-500 mt-1 block">{{ erroNome() }}</small>
+        }
+      </div>
+
+      <div class="mb-4">
+        <p-inputgroup>
+          <p-inputgroup-addon>R$</p-inputgroup-addon>
+          <p-inputnumber [ngModel]="vinhoForm.preco().value()" (ngModelChange)="vinhoForm.preco().value.set($event)" placeholder="Preço" mode="decimal" [minFractionDigits]="2"
+            [maxFractionDigits]="2" [showClear]="true" />
+        </p-inputgroup>
+        @if(erroPreco()) {
+          <small class="text-red-500 mt-1 block">{{ erroPreco() }}</small>
+        }
+      </div>
+
       <p-inputgroup class="mb-4">
         <p-inputgroup-addon>
           <i class="pi pi-tags"></i>
         </p-inputgroup-addon>
-        <p-select [(ngModel)]="tipoSelected" [options]="tipos" placeholder="Tipo" />
+        <p-select [ngModel]="vinhoForm.tipo().value()" (ngModelChange)="vinhoForm.tipo().value.set($event)" [options]="tipos" placeholder="Tipo" />
       </p-inputgroup>
+
       <p-inputgroup class="mb-8">
         <p-inputgroup-addon>
           <i class="pi pi-box"></i>
         </p-inputgroup-addon>
-        <p-togglebutton [(ngModel)]="disponivel" onLabel="Disponível" offLabel="Indisponível" />
+        <p-togglebutton [ngModel]="vinhoForm.disponivel().value()" (ngModelChange)="vinhoForm.disponivel().value.set($event)" onLabel="Disponível" offLabel="Indisponível" />
       </p-inputgroup>
 
       <div class="flex justify-end gap-2">
         <p-button label="Cancelar" severity="secondary" (click)="cleanForm() ; visible = false" />
-        <p-button label="Salvar" (click)="update(); visible = false" />
+        <p-button label="Salvar" (click)="update(); visible = false" [disabled]="!formValido()" />
       </div>
     </p-dialog>
   </div>
