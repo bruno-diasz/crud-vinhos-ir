@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table'
 import { FormsModule } from '@angular/forms';
-import { form, FormField } from '@angular/forms/signals'
+import { form, FormField, required, min } from '@angular/forms/signals'
 import { SelectModule } from 'primeng/select';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -14,7 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 
 interface Vinho {
   id: number;
@@ -42,8 +42,8 @@ interface Vinho {
     DialogModule,
     ToastModule,
     DecimalPipe,
-    FormField
-  ],
+    FormField,
+],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [ConfirmationService, MessageService]
@@ -64,7 +64,12 @@ export class App {
     tipo: 'Suave',
   })
 
-  vinhoForm = form(this.vinho)
+  // Criação e validação dos campos
+  vinhoForm = form(this.vinho, (schemaPath) => {
+    required(schemaPath.nome, {message: 'O nome do vinho é obrigatório.'} );
+    required(schemaPath.preco, {message: 'O preço do vinho é obrigatório.'});
+    min(schemaPath.preco, 0.01, {message: 'O preço deve ser maior que zero.'});
+  })
   
   nextId: number = 2;
   tipos: string[] = ['Suave', 'Seco', 'Branco', 'Tinto'];
@@ -75,31 +80,10 @@ export class App {
   messageService = inject(MessageService);
   visible: boolean = false;
 
-  // Validações com computed 
-  erroNome = computed(() => {
-    const nome = this.vinhoForm.nome().value();
-    if (!nome || nome.trim() === '') {
-      return 'O nome do vinho é obrigatório.';
-    }
-    return null;
-  });
-
-  erroPreco = computed(() => {
-    const preco = this.vinhoForm.preco().value();
-    if (preco === null || preco <= 0) {
-      return 'O preço deve ser maior que zero.';
-    }
-    return null;
-  });
-
-  formValido = computed(() => {
-    return this.erroNome() === null && this.erroPreco() === null;
-  });
-
 
   // Metodos
   save() {
-    if (this.formValido()) {
+    if (this.vinhoForm().valid()) {
       this.vinhos.push({
         id: this.nextId,
         nome: this.vinhoForm.nome().value(),
@@ -117,7 +101,7 @@ export class App {
   }
 
   update() {
-    if (this.idEmEdicao != null && this.formValido()) {
+    if (this.idEmEdicao != null && this.vinhoForm().valid()) {
       let vinhoEditado: Vinho = {
         id: this.idEmEdicao,
         nome: this.vinhoForm.nome().value(),
