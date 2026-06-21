@@ -1,0 +1,40 @@
+@if (vinhoNaoEncontrado) {
+  <div class="text-center mt-20">
+    <p class="text-red-500 mb-4">Vinho não encontrado.</p>
+    <p-button label="Voltar para listagem" icon="pi pi-arrow-left" severity="secondary" (click)="voltar()" />
+  </div>
+} @else if (vinho) {
+  <p-fieldset legend="Detalhes do Vinho">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="font-bold text-gray-600 block mb-1">ID</label>
+        <p class="text-lg">{{ vinho.id }}</p>
+      </div>
+
+      <div>
+        <label class="font-bold text-gray-600 block mb-1">Nome</label>
+        <p class="text-lg">{{ vinho.nome }}</p>
+      </div>
+
+      <div>
+        <label class="font-bold text-gray-600 block mb-1">Preço</label>
+        <p class="text-lg">R$ {{ vinho.preco | number:'1.2-2' }}</p>
+      </div>
+
+      <div>
+        <label class="font-bold text-gray-600 block mb-1">Tipo</label>
+        <p class="text-lg">{{ vinho.tipo }}</p>
+      </div>
+
+      <div>
+        <label class="font-bold text-gray-600 block mb-1">Disponibilidade</label>
+        <p class="text-lg">{{ vinho.disponivel ? 'Disponível' : 'Indisponível' }}</p>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mt-8">
+      <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" (click)="voltar()" />
+      <p-button label="Editar" icon="pi pi-pencil" (click)="editar()" />
+    </div>
+  </p-fieldset>
+}

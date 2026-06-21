@@ -1,18 +1,12 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { InputTextModule } from 'primeng/inputtext';
-import { ToggleButtonModule } from 'primeng/togglebutton';
-import { DialogModule } from 'primeng/dialog';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 import { Vinho } from '../models/vinho.model';
+import { VinhoService } from '../services/vinho.service';
 
 @Component({
   selector: 'app-wine-table',
@@ -20,16 +14,8 @@ import { Vinho } from '../models/vinho.model';
   imports: [
     CommonModule,
     DecimalPipe,
-    FormsModule,
     ButtonModule,
     TableModule,
-    SelectModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    InputTextModule,
-    ToggleButtonModule,
-    DialogModule,
-    ToastModule,
     ConfirmDialogModule
   ],
   templateUrl: './wine-table.html',
@@ -37,14 +23,19 @@ import { Vinho } from '../models/vinho.model';
   providers: [ConfirmationService]
 })
 export class WineTable {
-  @Input() vinhos: Vinho[] = [];
-  @Output() editar = new EventEmitter<Vinho>();
-  @Output() deletar = new EventEmitter<number>();
+  private vinhoService = inject(VinhoService);
+  private router = inject(Router);
+  private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
 
-  confirmationService = inject(ConfirmationService);
+  vinhos = this.vinhoService.listar();
+
+  showDetail(vinho: Vinho) {
+    this.router.navigate(['/vinhos', vinho.id], { state: { vinho } });
+  }
 
   showUpdateDialog(vinho: Vinho) {
-    this.editar.emit(vinho);
+    this.router.navigate(['/vinhos', vinho.id, 'editar'], { state: { vinho } });
   }
 
   showDeleteDialog(event: Event, vinho: Vinho) {
@@ -63,9 +54,8 @@ export class WineTable {
         severity: 'danger'
       },
       accept: () => {
-        this.deletar.emit(vinho.id);
-      },
-      reject: () => {
+        this.vinhoService.remover(vinho.id);
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho excluído com sucesso' });
       }
     });
   }
