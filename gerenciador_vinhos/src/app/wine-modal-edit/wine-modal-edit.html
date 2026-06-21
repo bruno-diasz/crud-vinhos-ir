@@ -1,48 +1,54 @@
-<p-fieldset legend="Editar Vinho">
-  <div class="card grid grid-cols-1 md:grid-cols-2 gap-4">
+@if (carregando) {
+  <div class="text-center mt-20">
+    <p class="text-gray-500">Carregando...</p>
+  </div>
+} @else {
+  <p-fieldset legend="Editar Vinho">
+    <div class="card grid grid-cols-1 md:grid-cols-2 gap-4">
 
-    <div class="flex flex-col">
-      <p-inputgroup>
-        <p-inputgroup-addon>🍷</p-inputgroup-addon>
-        <input pInputText [formField]="vinhoForm.nome" placeholder="Nome" />
-      </p-inputgroup>
-      @if(vinhoForm.nome().touched() && vinhoForm.nome().invalid()) {
-        @for (error of vinhoForm.nome().errors(); track error) {
-          <small class="text-red-500 mt-1">{{ error.message }}</small>
+      <div class="flex flex-col">
+        <p-inputgroup>
+          <p-inputgroup-addon>🍷</p-inputgroup-addon>
+          <input pInputText [formField]="vinhoForm.nome" placeholder="Nome" />
+        </p-inputgroup>
+        @if(vinhoForm.nome().touched() && vinhoForm.nome().invalid()) {
+          @for (error of vinhoForm.nome().errors(); track error) {
+            <small class="text-red-500 mt-1">{{ error.message }}</small>
+          }
         }
-      }
+      </div>
+
+      <div class="flex flex-col">
+        <p-inputgroup>
+          <p-inputgroup-addon>R$</p-inputgroup-addon>
+          <input type="number" [formField]="vinhoForm.preco" class="border pl-2 border-gray-300 rounded-y-sm rounded-r-sm">
+        </p-inputgroup>
+        @if(vinhoForm.preco().touched() && vinhoForm.preco().invalid()) {
+          @for (error of vinhoForm.preco().errors(); track error) {
+            <small class="text-red-500 mt-1">{{ error.message }}</small>
+          }
+        }
+      </div>
+
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-tags"></i>
+        </p-inputgroup-addon>
+        <p-select [ngModel]="vinhoForm.tipo().value()" (ngModelChange)="vinhoForm.tipo().value.set($event)" [options]="tipos" placeholder="Tipo" />
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-box"></i>
+        </p-inputgroup-addon>
+        <p-togglebutton [ngModel]="vinhoForm.disponivel().value()" (ngModelChange)="vinhoForm.disponivel().value.set($event)" onLabel="Disponível" offLabel="Indisponível" />
+      </p-inputgroup>
+
+      <p-button class="mt-8 md:col-span-2" label="Salvar" icon="pi pi-check" (onClick)="update()" [disabled]="vinhoForm().invalid() || salvando" />
     </div>
 
-    <div class="flex flex-col">
-      <p-inputgroup>
-        <p-inputgroup-addon>R$</p-inputgroup-addon>
-        <input type="number" [formField]="vinhoForm.preco" class="border pl-2 border-gray-300 rounded-y-sm rounded-r-sm">
-      </p-inputgroup>
-      @if(vinhoForm.preco().touched() && vinhoForm.preco().invalid()) {
-        @for (error of vinhoForm.preco().errors(); track error) {
-          <small class="text-red-500 mt-1">{{ error.message }}</small>
-        }
-      }
+    <div class="flex justify-start gap-2 mt-4">
+      <p-button label="Cancelar" severity="secondary" icon="pi pi-arrow-left" (click)="cancelar()" />
     </div>
-
-    <p-inputgroup>
-      <p-inputgroup-addon>
-        <i class="pi pi-tags"></i>
-      </p-inputgroup-addon>
-      <p-select [ngModel]="vinhoForm.tipo().value()" (ngModelChange)="vinhoForm.tipo().value.set($event)" [options]="tipos" placeholder="Tipo" />
-    </p-inputgroup>
-
-    <p-inputgroup>
-      <p-inputgroup-addon>
-        <i class="pi pi-box"></i>
-      </p-inputgroup-addon>
-      <p-togglebutton [ngModel]="vinhoForm.disponivel().value()" (ngModelChange)="vinhoForm.disponivel().value.set($event)" onLabel="Disponível" offLabel="Indisponível" />
-    </p-inputgroup>
-
-    <p-button class="mt-8 md:col-span-2" label="Salvar" icon="pi pi-check" (onClick)="update()" [disabled]="vinhoForm().invalid()" />
-  </div>
-
-  <div class="flex justify-start gap-2 mt-4">
-    <p-button label="Cancelar" severity="secondary" icon="pi pi-arrow-left" (click)="cancelar()" />
-  </div>
-</p-fieldset>
+  </p-fieldset>
+}

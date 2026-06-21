@@ -39,7 +39,7 @@
       <p-togglebutton [ngModel]="vinhoForm.disponivel().value()" (ngModelChange)="vinhoForm.disponivel().value.set($event)" onLabel="Disponível" offLabel="Indisponível" />
     </p-inputgroup>
 
-    <p-button class="mt-8 md:col-span-2" label="Salvar" icon="pi pi-check" (onClick)="save()" [disabled]="vinhoForm().invalid()" />
+    <p-button class="mt-8 md:col-span-2" label="Salvar" icon="pi pi-check" (onClick)="save()" [disabled]="vinhoForm().invalid() || salvando" />
   </div>
 
   <div class="flex justify-start gap-2 mt-4">

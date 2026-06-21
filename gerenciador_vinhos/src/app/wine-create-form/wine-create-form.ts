@@ -37,6 +37,8 @@ export class WineCreateForm {
   private router = inject(Router);
   private messageService = inject(MessageService);
 
+  salvando = false;
+
   tipos = this.vinhoService.tipos;
 
   vinho = signal<Vinho>({
@@ -55,16 +57,24 @@ export class WineCreateForm {
 
   save() {
     if (this.vinhoForm().valid()) {
-      const novoVinho: Vinho = {
-        id: 0,
+      this.salvando = true;
+      const novoVinho: Omit<Vinho, 'id'> = {
         nome: this.vinhoForm.nome().value(),
         preco: this.vinhoForm.preco().value(),
         tipo: this.vinhoForm.tipo().value(),
         disponivel: this.vinhoForm.disponivel().value()
       };
-      this.vinhoService.inserir(novoVinho);
-      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho adicionado com sucesso' });
-      this.router.navigate(['/vinhos']);
+      this.vinhoService.inserir(novoVinho).subscribe({
+        next: () => {
+          this.vinhoService.refreshList();
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho adicionado com sucesso' });
+          this.router.navigate(['/vinhos']);
+        },
+        error: () => {
+          this.salvando = false;
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao adicionar vinho' });
+        }
+      });
     } else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios' });
     }

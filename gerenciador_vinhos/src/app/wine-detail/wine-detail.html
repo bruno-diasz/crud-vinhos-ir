@@ -1,4 +1,8 @@
-@if (vinhoNaoEncontrado) {
+@if (carregando) {
+  <div class="text-center mt-20">
+    <p class="text-gray-500">Carregando...</p>
+  </div>
+} @else if (vinhoNaoEncontrado) {
   <div class="text-center mt-20">
     <p class="text-red-500 mb-4">Vinho não encontrado.</p>
     <p-button label="Voltar para listagem" icon="pi pi-arrow-left" severity="secondary" (click)="voltar()" />

@@ -1,33 +1,49 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal, WritableSignal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Vinho } from '../models/vinho.model';
 
 @Injectable({ providedIn: 'root' })
 export class VinhoService {
-  private vinhos = signal<Vinho[]>([
-    { id: 1, nome: 'Bons Ventos', preco: 52.99, tipo: 'Seco', disponivel: true },
-  ]);
-  private nextId = 2;
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:8000/api/vinhos/';
+
+  private vinhos = signal<Vinho[]>([]);
+  private initialized = false;
 
   tipos = ['Suave', 'Seco', 'Branco', 'Tinto'];
 
-  listar() {
+  listar(): WritableSignal<Vinho[]> {
+    if (!this.initialized) {
+      this.initialized = true;
+      this.http.get<Vinho[]>(this.apiUrl).subscribe({
+        next: (data) => this.vinhos.set(data),
+        error: () => this.vinhos.set([])
+      });
+    }
     return this.vinhos;
   }
 
-  detalhar(id: number): Vinho | undefined {
-    return this.vinhos().find(v => v.id === id);
+  refreshList(): void {
+    this.http.get<Vinho[]>(this.apiUrl).subscribe({
+      next: (data) => this.vinhos.set(data),
+      error: () => this.vinhos.set([])
+    });
   }
 
-  inserir(vinho: Vinho): void {
-    const novo: Vinho = { ...vinho, id: this.nextId++ };
-    this.vinhos.update(lista => [...lista, novo]);
+  detalhar(id: number): Observable<Vinho> {
+    return this.http.get<Vinho>(`${this.apiUrl}${id}/`);
   }
 
-  atualizar(vinho: Vinho): void {
-    this.vinhos.update(lista => lista.map(v => v.id === vinho.id ? vinho : v));
+  inserir(vinho: Omit<Vinho, 'id'>): Observable<Vinho> {
+    return this.http.post<Vinho>(this.apiUrl, vinho);
   }
 
-  remover(id: number): void {
-    this.vinhos.update(lista => lista.filter(v => v.id !== id));
+  atualizar(vinho: Vinho): Observable<Vinho> {
+    return this.http.put<Vinho>(`${this.apiUrl}${vinho.id}/`, vinho);
+  }
+
+  remover(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}${id}/`);
   }
 }
