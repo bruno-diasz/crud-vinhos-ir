@@ -33,6 +33,22 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:8000',
+    'https://localhost:4200',
+    'http://localhost:4200',
+    'http://localhost:5173',
+    'https://localhost:5173',
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'UPLOADED_FILES_USE_URL': False,
+}
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
