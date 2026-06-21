@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField, form, required, min } from '@angular/forms/signals';
@@ -32,7 +32,7 @@ import { VinhoService } from '../services/vinho.service';
   templateUrl: './wine-modal-edit.html',
   styleUrl: './wine-modal-edit.css'
 })
-export class WineModalEdit {
+export class WineModalEdit implements OnInit {
   private vinhoService = inject(VinhoService);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
@@ -40,6 +40,8 @@ export class WineModalEdit {
 
   tipos = this.vinhoService.tipos;
   idEmEdicao: number | null = null;
+  carregando = true;
+  salvando = false;
 
   vinho = signal<Vinho>({
     id: 0,
@@ -55,26 +57,39 @@ export class WineModalEdit {
     min(schemaPath.preco, 0.01, { message: 'O preço deve ser maior que zero.' });
   });
 
-  constructor() {
+  ngOnInit() {
     const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
     const vinhoState = history.state?.vinho as Vinho | undefined;
 
-    const vinho = vinhoState || this.vinhoService.detalhar(id);
-
-    if (vinho) {
-      this.idEmEdicao = vinho.id;
-      this.vinhoForm.nome().value.set(vinho.nome);
-      this.vinhoForm.preco().value.set(vinho.preco);
-      this.vinhoForm.tipo().value.set(vinho.tipo);
-      this.vinhoForm.disponivel().value.set(vinho.disponivel);
+    if (vinhoState) {
+      this.popularForm(vinhoState);
+      this.carregando = false;
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Vinho não encontrado' });
-      this.router.navigate(['/vinhos']);
+      this.vinhoService.detalhar(id).subscribe({
+        next: (data) => {
+          this.popularForm(data);
+          this.carregando = false;
+        },
+        error: () => {
+          this.carregando = false;
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Vinho não encontrado' });
+          this.router.navigate(['/vinhos']);
+        }
+      });
     }
+  }
+
+  private popularForm(vinho: Vinho) {
+    this.idEmEdicao = vinho.id;
+    this.vinhoForm.nome().value.set(vinho.nome);
+    this.vinhoForm.preco().value.set(vinho.preco);
+    this.vinhoForm.tipo().value.set(vinho.tipo);
+    this.vinhoForm.disponivel().value.set(vinho.disponivel);
   }
 
   update() {
     if (this.idEmEdicao != null && this.vinhoForm().valid()) {
+      this.salvando = true;
       const vinhoEditado: Vinho = {
         id: this.idEmEdicao,
         nome: this.vinhoForm.nome().value(),
@@ -82,9 +97,17 @@ export class WineModalEdit {
         tipo: this.vinhoForm.tipo().value(),
         disponivel: this.vinhoForm.disponivel().value()
       };
-      this.vinhoService.atualizar(vinhoEditado);
-      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho editado com sucesso' });
-      this.router.navigate(['/vinhos']);
+      this.vinhoService.atualizar(vinhoEditado).subscribe({
+        next: () => {
+          this.vinhoService.refreshList();
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho editado com sucesso' });
+          this.router.navigate(['/vinhos']);
+        },
+        error: () => {
+          this.salvando = false;
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao editar vinho' });
+        }
+      });
     } else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios' });
     }

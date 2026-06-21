@@ -54,8 +54,15 @@ export class WineTable {
         severity: 'danger'
       },
       accept: () => {
-        this.vinhoService.remover(vinho.id);
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho excluído com sucesso' });
+        this.vinhoService.remover(vinho.id).subscribe({
+          next: () => {
+            this.vinhoService.refreshList();
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho excluído com sucesso' });
+          },
+          error: () => {
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao excluir vinho' });
+          }
+        });
       }
     });
   }

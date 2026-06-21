@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { WineTable } from './wine-table';
 
@@ -10,7 +11,7 @@ describe('WineTable', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [WineTable],
-      providers: [provideRouter([]), MessageService, ConfirmationService]
+      providers: [provideRouter([]), provideHttpClient(), MessageService, ConfirmationService]
     }).compileComponents();
 
     fixture = TestBed.createComponent(WineTable);

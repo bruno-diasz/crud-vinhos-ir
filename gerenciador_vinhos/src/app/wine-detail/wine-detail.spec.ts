@@ -2,20 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { WineModalEdit } from './wine-modal-edit';
+import { WineDetail } from './wine-detail';
 
-describe('WineModalEdit', () => {
-  let component: WineModalEdit;
-  let fixture: ComponentFixture<WineModalEdit>;
+describe('WineDetail', () => {
+  let component: WineDetail;
+  let fixture: ComponentFixture<WineDetail>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WineModalEdit],
+      imports: [WineDetail],
       providers: [
         provideRouter([]),
         provideHttpClient(),
-        MessageService,
         {
           provide: ActivatedRoute,
           useValue: {
@@ -29,9 +27,9 @@ describe('WineModalEdit', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(WineModalEdit);
+    fixture = TestBed.createComponent(WineDetail);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it('should create', () => {

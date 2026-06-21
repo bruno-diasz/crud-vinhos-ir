@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
@@ -18,22 +18,33 @@ import { VinhoService } from '../services/vinho.service';
   templateUrl: './wine-detail.html',
   styleUrl: './wine-detail.css'
 })
-export class WineDetail {
+export class WineDetail implements OnInit {
   private vinhoService = inject(VinhoService);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
 
   vinho: Vinho | null = null;
+  carregando = true;
   vinhoNaoEncontrado = false;
 
-  constructor() {
+  ngOnInit() {
     const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
-    const vinhoState = history.state.vinho as Vinho | undefined;
+    const vinhoState = history.state?.vinho as Vinho | undefined;
 
-    this.vinho = vinhoState || this.vinhoService.detalhar(id) || null;
-
-    if (!this.vinho) {
-      this.vinhoNaoEncontrado = true;
+    if (vinhoState) {
+      this.vinho = vinhoState;
+      this.carregando = false;
+    } else {
+      this.vinhoService.detalhar(id).subscribe({
+        next: (data) => {
+          this.vinho = data;
+          this.carregando = false;
+        },
+        error: () => {
+          this.carregando = false;
+          this.vinhoNaoEncontrado = true;
+        }
+      });
     }
   }
 
