@@ -1,0 +1,45 @@
+<p-dialog header="Editar Vinho" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+  
+  <div class="mb-4">
+    <p-inputgroup>
+      <p-inputgroup-addon>🍷</p-inputgroup-addon>
+      <input pInputText [formField]="vinhoForm.nome" placeholder="Nome" />
+    </p-inputgroup>
+     @if(vinhoForm.nome().touched() && vinhoForm.nome().invalid()) {
+      @for (error of vinhoForm.nome().errors(); track error) {
+        <small class="text-red-500 mt-1">{{ error.message }}</small>
+      }
+    }
+  </div>
+
+  <div class="mb-4">
+    <p-inputgroup>
+      <p-inputgroup-addon>R$</p-inputgroup-addon>
+        <input type="number" [formField]="vinhoForm.preco" class="border pl-2 flex-1 border-gray-300 rounded-y-sm rounded-r-sm">
+    </p-inputgroup>
+    @if(vinhoForm.preco().touched() && vinhoForm.preco().invalid()) {
+      @for (error of vinhoForm.preco().errors(); track error) {
+        <small class="text-red-500 mt-1">{{ error.message }}</small>
+      }
+    }
+  </div>
+
+  <p-inputgroup class="mb-4">
+    <p-inputgroup-addon>
+      <i class="pi pi-tags"></i>
+    </p-inputgroup-addon>
+    <p-select [ngModel]="vinhoForm.tipo().value()" (ngModelChange)="vinhoForm.tipo().value.set($event)" [options]="tipos" placeholder="Tipo" />
+  </p-inputgroup>
+
+  <p-inputgroup class="mb-8">
+    <p-inputgroup-addon>
+      <i class="pi pi-box"></i>
+    </p-inputgroup-addon>
+    <p-togglebutton [ngModel]="vinhoForm.disponivel().value()" (ngModelChange)="vinhoForm.disponivel().value.set($event)" onLabel="Disponível" offLabel="Indisponível" />
+  </p-inputgroup>
+
+  <div class="flex justify-end gap-2">
+    <p-button label="Cancelar" severity="secondary" (click)="cleanForm() ; visible.set(false)" />
+    <p-button label="Salvar" (click)="update()" [disabled]="vinhoForm().invalid()" />
+  </div>
+</p-dialog>
