@@ -1,17 +1,18 @@
-import { Component, Input, Output, EventEmitter, model, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField, form, required, min } from '@angular/forms/signals';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
+import { FieldsetModule } from 'primeng/fieldset';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { MessageService } from 'primeng/api';
-import { signal } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Vinho } from '../models/vinho.model';
+import { VinhoService } from '../services/vinho.service';
 
 @Component({
   selector: 'app-wine-modal-edit',
@@ -21,7 +22,7 @@ import { Vinho } from '../models/vinho.model';
     FormsModule,
     FormField,
     ButtonModule,
-    DialogModule,
+    FieldsetModule,
     InputGroupModule,
     InputGroupAddonModule,
     InputTextModule,
@@ -29,16 +30,15 @@ import { Vinho } from '../models/vinho.model';
     ToggleButtonModule
   ],
   templateUrl: './wine-modal-edit.html',
-  styleUrl: './wine-modal-edit.css',
-  providers: [MessageService]
+  styleUrl: './wine-modal-edit.css'
 })
 export class WineModalEdit {
-  @Input() tipos: string[] = [];
-  @Input() vinhoEmEdicao: Vinho | null = null;
-  visible = model<boolean>(false);
-  @Output() vinhoAtualizado = new EventEmitter<Vinho>();
+  private vinhoService = inject(VinhoService);
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+  private messageService = inject(MessageService);
 
-  messageService = inject(MessageService);
+  tipos = this.vinhoService.tipos;
   idEmEdicao: number | null = null;
 
   vinho = signal<Vinho>({
@@ -55,13 +55,21 @@ export class WineModalEdit {
     min(schemaPath.preco, 0.01, { message: 'O preço deve ser maior que zero.' });
   });
 
-  ngOnChanges() {
-    if (this.vinhoEmEdicao) {
-      this.idEmEdicao = this.vinhoEmEdicao.id;
-      this.vinhoForm.nome().value.set(this.vinhoEmEdicao.nome);
-      this.vinhoForm.preco().value.set(this.vinhoEmEdicao.preco);
-      this.vinhoForm.tipo().value.set(this.vinhoEmEdicao.tipo);
-      this.vinhoForm.disponivel().value.set(this.vinhoEmEdicao.disponivel);
+  constructor() {
+    const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    const vinhoState = history.state?.vinho as Vinho | undefined;
+
+    const vinho = vinhoState || this.vinhoService.detalhar(id);
+
+    if (vinho) {
+      this.idEmEdicao = vinho.id;
+      this.vinhoForm.nome().value.set(vinho.nome);
+      this.vinhoForm.preco().value.set(vinho.preco);
+      this.vinhoForm.tipo().value.set(vinho.tipo);
+      this.vinhoForm.disponivel().value.set(vinho.disponivel);
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Vinho não encontrado' });
+      this.router.navigate(['/vinhos']);
     }
   }
 
@@ -74,20 +82,15 @@ export class WineModalEdit {
         tipo: this.vinhoForm.tipo().value(),
         disponivel: this.vinhoForm.disponivel().value()
       };
-      this.vinhoAtualizado.emit(vinhoEditado);
-      this.cleanForm();
-      this.visible.set(false);
+      this.vinhoService.atualizar(vinhoEditado);
       this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho editado com sucesso' });
+      this.router.navigate(['/vinhos']);
     } else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios' });
     }
   }
 
-  cleanForm() {
-    this.vinhoForm.nome().value.set('');
-    this.vinhoForm.preco().value.set(0);
-    this.vinhoForm.tipo().value.set('Suave');
-    this.vinhoForm.disponivel().value.set(false);
-    this.idEmEdicao = null;
+  cancelar() {
+    this.router.navigate(['/vinhos']);
   }
 }

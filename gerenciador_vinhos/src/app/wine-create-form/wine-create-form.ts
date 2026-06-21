@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField, form, required, min } from '@angular/forms/signals';
@@ -9,10 +9,10 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToggleButtonModule } from 'primeng/togglebutton';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Vinho } from '../models/vinho.model';
+import { VinhoService } from '../services/vinho.service';
 
 @Component({
   selector: 'app-wine-create-form',
@@ -27,18 +27,17 @@ import { Vinho } from '../models/vinho.model';
     InputGroupAddonModule,
     InputTextModule,
     SelectModule,
-    ToggleButtonModule,
-    ToastModule
+    ToggleButtonModule
   ],
   templateUrl: './wine-create-form.html',
-  styleUrl: './wine-create-form.css',
-  providers: [MessageService]
+  styleUrl: './wine-create-form.css'
 })
 export class WineCreateForm {
-  @Input() tipos: string[] = [];
-  @Output() vinhoSalvo = new EventEmitter<Vinho>();
+  private vinhoService = inject(VinhoService);
+  private router = inject(Router);
+  private messageService = inject(MessageService);
 
-  messageService = inject(MessageService);
+  tipos = this.vinhoService.tipos;
 
   vinho = signal<Vinho>({
     id: 0,
@@ -63,9 +62,9 @@ export class WineCreateForm {
         tipo: this.vinhoForm.tipo().value(),
         disponivel: this.vinhoForm.disponivel().value()
       };
-      this.vinhoSalvo.emit(novoVinho);
-      this.cleanForm();
+      this.vinhoService.inserir(novoVinho);
       this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Vinho adicionado com sucesso' });
+      this.router.navigate(['/vinhos']);
     } else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios' });
     }
@@ -76,5 +75,9 @@ export class WineCreateForm {
     this.vinhoForm.preco().value.set(0);
     this.vinhoForm.tipo().value.set('Suave');
     this.vinhoForm.disponivel().value.set(false);
+  }
+
+  cancelar() {
+    this.router.navigate(['/vinhos']);
   }
 }
