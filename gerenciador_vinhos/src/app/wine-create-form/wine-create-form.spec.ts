@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { WineCreateForm } from './wine-create-form';
 
@@ -11,7 +11,7 @@ describe('WineCreateForm', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [WineCreateForm],
-      providers: [provideRouter([]), provideHttpClient(), MessageService]
+      providers: [provideRouter([]), provideHttpClient(withInterceptors([])), MessageService]
     }).compileComponents();
 
     fixture = TestBed.createComponent(WineCreateForm);
