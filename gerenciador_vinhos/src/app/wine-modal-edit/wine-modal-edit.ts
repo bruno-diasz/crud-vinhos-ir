@@ -1,5 +1,4 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField, form, required, min } from '@angular/forms/signals';
 import { ButtonModule } from 'primeng/button';
@@ -18,7 +17,6 @@ import { VinhoService } from '../services/vinho.service';
   selector: 'app-wine-modal-edit',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     FormField,
     ButtonModule,

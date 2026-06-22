@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -12,7 +12,6 @@ import { VinhoService } from '../services/vinho.service';
   selector: 'app-wine-table',
   standalone: true,
   imports: [
-    CommonModule,
     DecimalPipe,
     ButtonModule,
     TableModule,

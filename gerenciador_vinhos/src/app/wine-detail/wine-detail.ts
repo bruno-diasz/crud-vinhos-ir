@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,7 +10,6 @@ import { VinhoService } from '../services/vinho.service';
   selector: 'app-wine-detail',
   standalone: true,
   imports: [
-    CommonModule,
     DecimalPipe,
     ButtonModule,
     FieldsetModule

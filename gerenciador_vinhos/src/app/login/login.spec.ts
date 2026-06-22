@@ -1,33 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
-import { WineDetail } from './wine-detail';
+import { MessageService } from 'primeng/api';
+import { LoginComponent } from './login';
 
-describe('WineDetail', () => {
-  let component: WineDetail;
-  let fixture: ComponentFixture<WineDetail>;
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WineDetail],
+      imports: [LoginComponent],
       providers: [
         provideRouter([]),
         provideHttpClient(withInterceptors([])),
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: () => '1'
-              }
-            }
-          }
-        }
+        MessageService
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(WineDetail);
+    fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

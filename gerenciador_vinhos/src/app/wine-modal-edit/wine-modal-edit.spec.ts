@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { WineModalEdit } from './wine-modal-edit';
@@ -14,7 +14,7 @@ describe('WineModalEdit', () => {
       imports: [WineModalEdit],
       providers: [
         provideRouter([]),
-        provideHttpClient(),
+        provideHttpClient(withInterceptors([])),
         MessageService,
         {
           provide: ActivatedRoute,
