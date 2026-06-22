@@ -1,16 +1,16 @@
-<div class="flex align-items-center justify-content-center min-h-screen">
-  <div class="card p-6 shadow-3 border-round" style="width: 400px">
+<div class="flex items-center justify-center min-h-screen">
+  <div class="card p-6 shadow-xl rounded-2xl" style="width: 400px">
     <h2 class="text-center mb-6">Login</h2>
 
-    <div class="flex flex-column gap-4">
-      <div class="flex flex-column gap-2">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
         <label for="username">Usuário</label>
-        <input id="username" pInputText [(ngModel)]="username" placeholder="Digite seu usuário" />
+        <input id="username" pInputText [(ngModel)]="username" placeholder="Digite seu usuário" class="w-full" />
       </div>
 
-      <div class="flex flex-column gap-2">
+      <div class="flex flex-col gap-2">
         <label for="password">Senha</label>
-        <p-password id="password" [(ngModel)]="password" [feedback]="false" placeholder="Digite sua senha" [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }" />
+        <p-password id="password" [(ngModel)]="password" [feedback]="false" placeholder="Digite sua senha" styleClass="w-full" inputStyleClass="w-full" />
       </div>
 
       <p-button label="Entrar" icon="pi pi-sign-in" (onClick)="login()" [disabled]="carregando || !username || !password" [loading]="carregando" styleClass="w-full" />

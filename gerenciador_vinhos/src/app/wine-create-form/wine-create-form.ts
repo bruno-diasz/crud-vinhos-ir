@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField, form, required, min } from '@angular/forms/signals';
 import { ButtonModule } from 'primeng/button';
@@ -18,7 +17,6 @@ import { VinhoService } from '../services/vinho.service';
   selector: 'app-wine-create-form',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     FormField,
     ButtonModule,
