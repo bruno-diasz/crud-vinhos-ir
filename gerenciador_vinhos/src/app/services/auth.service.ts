@@ -12,7 +12,7 @@ interface TokenResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = 'http://localhost:8000/api/token/';
+  private apiUrl = 'https://curly-giggle-5r6gxjq47p4cv7xv-8000.app.github.dev/api/token/';
 
   private usuarioLogado = signal<string | null>(null);
 

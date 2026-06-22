@@ -6,7 +6,7 @@ import { Vinho } from '../models/vinho.model';
 @Injectable({ providedIn: 'root' })
 export class VinhoService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8000/api/vinhos/';
+  private apiUrl = 'https://curly-giggle-5r6gxjq47p4cv7xv-8000.app.github.dev/api/vinhos/';
 
   private vinhos = signal<Vinho[]>([]);
   private initialized = false;
